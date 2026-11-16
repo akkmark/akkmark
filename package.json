@@ -1,0 +1,8 @@
+{
+  "name": "leonida-al-dia",
+  "private": true,
+  "description": "Pipeline para generar los vídeos del canal Leonida Al Día",
+  "dependencies": {
+    "@fontsource/anton": "^5.0.0"
+  }
+}

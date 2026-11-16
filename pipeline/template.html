@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Anton"; src: url("../node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2") format("woff2"); }
+:root {
+  --ink: #120826; --night: #1b0b3a; --violet: #3a1466; --pink: #ff3d9a; --orange: #ff9a3d;
+  --yellow: #ffd166; --cyan: #35e0e8; --cream: #fff3e0; --ok: #3ddc97; --bad: #ff5470;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; overflow: hidden; }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: "Inter", sans-serif; color: var(--cream); background: var(--ink); }
+.abs { position: absolute; }
+#sky { inset: 0; background: linear-gradient(180deg, #0d0620 0%, #1b0b3a 30%, #4a1570 52%, #c2337f 66%, #ff8a4a 74%, #1b0b3a 74.2%, #0d0620 100%); }
+#sun { left: 1210px; top: 250px; width: 620px; height: 620px; border-radius: 50%; background: linear-gradient(180deg, #ffe27a 0%, #ff9a3d 45%, #ff3d9a 100%);
+  -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 46px, transparent 46px 60px), linear-gradient(180deg, #000 0 52%, transparent 52%);
+  -webkit-mask-composite: source-over; opacity: .9; }
+#sunmask { left: 0; top: 799px; width: 1920px; height: 281px; background: linear-gradient(180deg, #1b0b3a, #0d0620); }
+#gridwrap { left: 0; top: 799px; width: 1920px; height: 281px; perspective: 300px; perspective-origin: 50% 0%; overflow: hidden; }
+#grid { position: absolute; left: -1920px; bottom: 0; width: 5760px; height: 1200px; transform-origin: 50% 100%; transform: rotateX(78deg);
+  background-image: linear-gradient(90deg, rgba(255,61,154,.75) 0 3px, transparent 3px), linear-gradient(180deg, rgba(255,61,154,.75) 0 3px, transparent 3px);
+  background-size: 120px 120px; }
+#gridfade { left: 0; top: 799px; width: 1920px; height: 281px; background: linear-gradient(180deg, rgba(27,11,58,.95) 0%, rgba(27,11,58,0) 45%); }
+#horizon { left: 0; top: 797px; width: 1920px; height: 4px; background: linear-gradient(90deg, transparent, var(--yellow) 30%, var(--pink) 70%, transparent); box-shadow: 0 0 30px var(--pink); }
+#shade { inset: 0; background: linear-gradient(90deg, rgba(13,6,32,.88) 0%, rgba(13,6,32,.62) 55%, rgba(13,6,32,.1) 100%); }
+.palm { fill: none; stroke: #0b0418; stroke-linecap: round; }
+#bug { left: 80px; top: 54px; display: flex; align-items: center; gap: 16px; font-family: "Anton"; font-size: 34px; letter-spacing: 2px; }
+#bug .dot { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(180deg, var(--yellow), var(--pink)); }
+#bug em { font-style: normal; color: var(--orange); }
+
+.scene { position: absolute; inset: 0; opacity: 0; }
+.kicker { position: absolute; left: 80px; top: 150px; font-weight: 800; font-size: 30px; letter-spacing: 6px; text-transform: uppercase; color: var(--ink); background: var(--yellow); padding: 8px 22px 8px 26px; border-radius: 6px; }
+.headline { position: absolute; left: 80px; top: 214px; width: 1500px; font-family: "Anton"; font-size: 104px; line-height: 1.08; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 6px 0 rgba(0,0,0,.35); }
+.widget { position: absolute; left: 80px; top: 372px; width: 1760px; height: 440px; }
+
+.hook .big { font-family: "Anton"; font-size: 270px; line-height: 1; letter-spacing: 2px; background: linear-gradient(180deg, #ffe27a 10%, #ff9a3d 50%, #ff3d9a 95%); -webkit-background-clip: text; color: transparent; filter: drop-shadow(0 10px 0 rgba(0,0,0,.4)); transform-origin: 0 60%; white-space: nowrap; }
+.hook .sub { margin-top: 18px; font-size: 44px; font-weight: 700; color: var(--cream); }
+
+.stat { display: flex; flex-direction: column; }
+.stat .row { display: flex; align-items: baseline; gap: 26px; }
+.stat .value { font-family: "Anton"; font-size: 300px; line-height: 1; background: linear-gradient(180deg, #ffe27a 10%, #ff9a3d 55%, #ff3d9a 100%); -webkit-background-clip: text; color: transparent; filter: drop-shadow(0 10px 0 rgba(0,0,0,.4)); }
+.stat .unit { font-family: "Anton"; font-size: 120px; color: var(--cyan); text-transform: uppercase; }
+.stat .label { margin-top: 14px; font-size: 38px; font-weight: 700; color: var(--cream); opacity: .92; }
+
+.bullets { display: flex; gap: 60px; align-items: flex-start; }
+.bullets ul { list-style: none; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+.bullets li { display: flex; align-items: center; gap: 26px; font-size: 50px; font-weight: 800; background: rgba(18,8,38,.78); border-left: 10px solid var(--pink); padding: 18px 34px; border-radius: 10px; width: fit-content; max-width: 1300px; }
+.bullets li .n { font-family: "Anton"; font-size: 56px; color: var(--yellow); min-width: 44px; }
+.bullets li .tick { width: 22px; height: 22px; border-radius: 50%; background: var(--orange); flex: none; }
+.avatar { width: 380px; height: 380px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; font-family: "Anton"; font-size: 240px; color: var(--ink); background: linear-gradient(180deg, #ffe27a, #ff9a3d 50%, #ff3d9a); box-shadow: 0 0 0 12px rgba(18,8,38,.7), 0 0 80px rgba(255,61,154,.6); margin-right: 80px; }
+
+.compare { display: flex; gap: 50px; }
+.compare .card { flex: 1; max-width: 800px; background: rgba(18,8,38,.84); border-radius: 18px; border-top: 12px solid var(--cyan); padding: 30px 40px; }
+.compare .card.r { border-top-color: var(--pink); }
+.compare .name { font-family: "Anton"; font-size: 60px; letter-spacing: 3px; }
+.compare .price { font-family: "Anton"; font-size: 104px; line-height: 1.05; color: var(--yellow); }
+.compare ul { list-style: none; margin-top: 10px; }
+.compare li { font-size: 34px; font-weight: 700; padding: 5px 0; }
+.compare li::before { content: "+ "; color: var(--orange); font-weight: 900; }
+
+.verdict { display: flex; flex-direction: column; gap: 24px; }
+.verdict .v { display: flex; align-items: center; gap: 30px; background: rgba(18,8,38,.8); border-radius: 12px; padding: 16px 34px 16px 16px; width: fit-content; max-width: 1700px; }
+.verdict .badge { font-family: "Anton"; font-size: 44px; letter-spacing: 2px; padding: 10px 26px; border-radius: 8px; color: var(--ink); white-space: nowrap; }
+.verdict .ok { background: var(--ok); } .verdict .bad { background: var(--bad); color: #fff; } .verdict .warn { background: var(--orange); } .verdict .info { background: var(--cyan); }
+.verdict .txt { font-size: 46px; font-weight: 800; }
+
+.timeline { position: relative; height: 100%; }
+.timeline .line { position: absolute; left: 0; top: 130px; height: 8px; width: 1700px; border-radius: 4px; background: linear-gradient(90deg, var(--cyan), var(--pink)); transform-origin: 0 50%; }
+.timeline .node { position: absolute; top: 0; width: 400px; }
+.timeline .date { font-family: "Anton"; font-size: 84px; color: var(--yellow); height: 110px; white-space: nowrap; }
+.timeline .pin { width: 36px; height: 36px; border-radius: 50%; background: var(--cream); border: 8px solid var(--pink); margin-top: 6px; }
+.timeline .t { margin-top: 26px; font-size: 38px; font-weight: 800; background: rgba(18,8,38,.8); padding: 14px 20px; border-radius: 10px; width: fit-content; max-width: 400px; }
+
+.map { display: flex; gap: 40px; height: 100%; }
+.map .note { width: 760px; font-size: 54px; font-weight: 800; line-height: 1.2; background: rgba(18,8,38,.8); border-left: 10px solid var(--cyan); padding: 26px 34px; border-radius: 10px; height: fit-content; }
+.map .count { font-family: "Anton"; font-size: 150px; color: var(--yellow); line-height: 1; margin-top: 30px; }
+.map svg { position: absolute; left: 960px; top: -200px; width: 740px; height: 602px; background: rgba(13,6,32,.86); border-radius: 24px; border: 3px solid rgba(255,255,255,.12); }
+.map .disc { position: absolute; left: 960px; top: 414px; font-size: 22px; font-weight: 700; letter-spacing: 1px; color: var(--cream); opacity: .8; background: rgba(18,8,38,.75); padding: 6px 14px; border-radius: 6px; }
+
+.outro { display: flex; flex-direction: column; gap: 34px; align-items: flex-start; }
+.outro .btn { font-family: "Anton"; font-size: 96px; letter-spacing: 3px; background: var(--bad); color: #fff; padding: 14px 56px; border-radius: 16px; box-shadow: 0 12px 0 rgba(0,0,0,.4); transform-origin: 0 50%; }
+.outro .ch { font-size: 46px; font-weight: 800; }
+.outro .ch b { color: var(--yellow); }
+
+#cap { left: 0; top: 868px; width: 1920px; display: flex; justify-content: center; }
+#cap .pill { font-size: 56px; font-weight: 900; padding: 14px 40px 18px; border-radius: 16px; background: rgba(8,3,20,.9); border: 3px solid rgba(255,255,255,.14); white-space: nowrap; }
+#cap span { opacity: .5; } #cap span.on { opacity: 1; } #cap span.now { opacity: 1; color: var(--yellow); }
+#bar { left: 0; top: 1070px; height: 10px; width: 0; background: linear-gradient(90deg, var(--cyan), var(--pink), var(--orange)); }
+
+/* miniatura / marca */
+.thumb .top { position: absolute; left: 90px; top: 110px; font-family: "Anton"; font-size: 120px; background: var(--yellow); color: var(--ink); padding: 0 34px; border-radius: 12px; transform: rotate(-3deg); }
+.thumb .bigt { position: absolute; left: 80px; top: 300px; width: 1300px; font-family: "Anton"; font-size: 300px; line-height: .98; color: #fff; -webkit-text-stroke: 10px var(--ink); paint-order: stroke fill; text-shadow: 0 16px 0 var(--pink); }
+.thumb .tag { position: absolute; left: 90px; top: 880px; font-family: "Anton"; font-size: 96px; background: var(--pink); color: #fff; padding: 4px 40px; border-radius: 12px; transform: rotate(-2deg); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="sky" class="abs"></div>
+  <div id="sun" class="abs"></div>
+  <div id="sunmask" class="abs"></div>
+  <div id="gridwrap" class="abs"><div id="grid"></div></div>
+  <div id="gridfade" class="abs"></div>
+  <div id="horizon" class="abs"></div>
+  <svg id="palms" class="abs" style="left:0;top:0" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+  <div id="shade" class="abs"></div>
+  <div id="bug" class="abs"><div class="dot"></div><div>LEONIDA <em>AL DÍA</em></div></div>
+  <div id="scenes"></div>
+  <div id="cap" class="abs"></div>
+  <div id="bar" class="abs"></div>
+</div>
+<script>
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const easeOut = (p) => 1 - Math.pow(1 - p, 3);
+const backOut = (p) => { const c = 1.9; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+function h(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+
+// Palmeras (siluetas originales): tronco curvo + hojas.
+function palm(x, baseY, height, lean, scale) {
+  const topX = x + lean, topY = baseY - height;
+  let d = `<path class="palm" stroke-width="${22 * scale}" d="M${x} ${baseY} Q${x + lean * 0.2} ${baseY - height * 0.55} ${topX} ${topY}"/>`;
+  const fronds = [[-250, -40], [-200, -150], [-70, -210], [90, -200], [210, -130], [250, -20], [-150, 60], [160, 70]];
+  for (const [dx, dy] of fronds) {
+    const ex = topX + dx * scale, ey = topY + dy * scale + 150 * scale;
+    const cx = topX + dx * 0.55 * scale, cy = topY + dy * scale - 40 * scale;
+    d += `<path class="palm" stroke-width="${26 * scale}" d="M${topX} ${topY} Q${cx} ${cy} ${ex} ${ey}"/>`;
+  }
+  return d;
+}
+$("#palms").innerHTML = palm(1690, 860, 560, 90, 1) + palm(1850, 900, 420, -60, 0.75) + palm(1480, 830, 300, 40, 0.5);
+
+let V = null, T = null, anims = [], caps = [], sceneEls = [];
+
+function reveal(el, at, kind = "up") { anims.push({ el, at, kind }); el.style.opacity = 0; }
+
+// Reparte los elementos que comparten frase a lo largo de esa frase.
+function itemTimes(items, lines) {
+  const groups = {};
+  items.forEach((it, i) => { const a = Math.min(it.at ?? i, lines.length - 1); (groups[a] ||= []).push(i); });
+  const out = [];
+  for (const a in groups) { const L = lines[a], g = groups[a]; g.forEach((i, k) => { out[i] = L.start + 0.15 + (k / g.length) * L.dur * 0.85; }); }
+  return out;
+}
+
+const REGIONS = {
+  kalaga: { x: 430, y: 150, name: "MOUNT KALAGA" },
+  port: { x: 180, y: 215, name: "PORT GELLHORN" },
+  ambrosia: { x: 520, y: 340, name: "AMBROSIA" },
+  grass: { x: 500, y: 480, name: "GRASSRIVERS" },
+  vice: { x: 660, y: 520, name: "VICE CITY" },
+  keys: { x: 505, y: 650, name: "LEONIDA KEYS" },
+};
+const ORDER = ["vice", "keys", "grass", "port", "ambrosia", "kalaga"];
+function mapSvg(current) {
+  const seen = ORDER.slice(0, ORDER.indexOf(current) + 1);
+  let s = `<svg viewBox="0 0 860 700">
+    <path d="M60 170 Q250 110 430 120 Q600 110 640 190 Q700 330 720 470 Q720 560 640 585 Q560 590 500 540 Q440 470 420 380 Q400 280 300 250 Q170 250 70 235 Z" fill="rgba(18,8,38,.88)" stroke="#35e0e8" stroke-width="5" stroke-linejoin="round"/>
+    <ellipse cx="565" cy="395" rx="46" ry="34" fill="#35e0e8" opacity=".45"/>`;
+  for (const [i, x] of [[0, 600], [1, 555], [2, 505], [3, 455], [4, 405]]) s += `<ellipse cx="${x}" cy="${632 + i * 9}" rx="19" ry="9" fill="rgba(18,8,38,.88)" stroke="#35e0e8" stroke-width="4"/>`;
+  for (const id of ORDER) {
+    const r = REGIONS[id], on = id === current, was = seen.includes(id);
+    const ly = id === "keys" ? r.y + 14 : r.y - 28, lx = id === "keys" ? r.x - 235 : r.x;
+    s += `<g class="reg ${on ? "cur" : ""}" opacity="${was ? 1 : 0.5}">
+      ${on ? `<circle class="pulse" cx="${r.x}" cy="${r.y}" r="24" fill="none" stroke="#ffd166" stroke-width="6"/>` : ""}
+      <circle cx="${r.x}" cy="${r.y}" r="${on ? 18 : 12}" fill="${on ? "#ffd166" : was ? "#ff3d9a" : "#fff3e0"}"/>
+      <text x="${lx}" y="${ly}" text-anchor="middle" font-family="Anton" font-size="${on ? 40 : 26}" fill="${on ? "#ffd166" : "#fff3e0"}" stroke="#120826" stroke-width="7" paint-order="stroke">${r.name}</text></g>`;
+  }
+  return s + "</svg>";
+}
+
+function buildWidget(scene, tm, idx) {
+  const w = scene.widget, lines = tm.lines, t0 = tm.start, box = h("div", "widget " + w.type);
+  if (w.type === "hook") {
+    const big = h("div", "big", esc(w.big)); box.append(big); reveal(big, t0 + 0.25, "pop");
+    const sub = h("div", "sub", esc(w.sub)); box.append(sub); reveal(sub, t0 + 0.7);
+  } else if (w.type === "stat") {
+    const at = (lines[Math.min(1, lines.length - 1)] || lines[0]).start;
+    const row = h("div", "row"), val = h("div", "value", esc(w.value)), unit = h("div", "unit", esc(w.unit || ""));
+    row.append(val, unit); box.append(row); reveal(row, lines.length > 2 ? at : t0 + 0.3, "pop");
+    if (/^\d+$/.test(w.value) && +w.value > 9) anims.push({ el: val, at: lines.length > 2 ? at : t0 + 0.3, kind: "count", to: +w.value });
+    const lab = h("div", "label", esc(w.label)); box.append(lab); reveal(lab, (lines.length > 2 ? at : t0 + 0.3) + 0.5);
+  } else if (w.type === "bullets") {
+    if (w.avatar) { const a = h("div", "avatar", esc(w.avatar)); box.append(a); reveal(a, t0 + 0.2, "pop"); }
+    const ul = h("ul"), times = itemTimes(w.items, lines);
+    w.items.forEach((it, i) => {
+      const li = h("li", "", (w.numbered ? `<span class="n">${(w.start || 1) + i}</span>` : `<span class="tick"></span>`) + `<span>${esc(it.t)}</span>`);
+      ul.append(li); reveal(li, times[i], "left");
+    });
+    box.append(ul);
+  } else if (w.type === "compare") {
+    for (const [side, cls] of [[w.left, "l"], [w.right, "r"]]) {
+      const c = h("div", "card " + cls, `<div class="name">${esc(side.name)}</div><div class="price">${esc(side.price)}</div><ul>${side.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`);
+      box.append(c); reveal(c, lines[Math.min(side.at, lines.length - 1)].start + 0.1, "up");
+    }
+  } else if (w.type === "verdict") {
+    const times = itemTimes(w.items, lines);
+    w.items.forEach((it, i) => {
+      const v = h("div", "v", `<span class="badge ${it.tone}">${esc(it.label)}</span><span class="txt">${esc(it.t)}</span>`);
+      box.append(v); reveal(v, times[i], "left");
+    });
+  } else if (w.type === "timeline") {
+    const line = h("div", "line"); box.append(line); anims.push({ el: line, at: t0 + 0.2, kind: "grow" });
+    const times = itemTimes(w.items, lines), n = w.items.length;
+    w.items.forEach((it, i) => {
+      const node = h("div", "node", `<div class="date">${esc(it.date)}</div><div class="pin"></div><div class="t">${esc(it.t)}</div>`);
+      node.style.left = (i * (1700 / n)) + "px"; box.append(node); reveal(node, times[i], "up");
+    });
+  } else if (w.type === "map") {
+    const left = h("div", "", `<div class="note">${esc(w.note)}</div><div class="count">${ORDER.indexOf(w.region) + 1}<span style="color:#fff3e0;font-size:80px"> / 6</span></div>`);
+    box.append(left); reveal(left, t0 + 0.5, "left");
+    const m = h("div", "", mapSvg(w.region)); box.append(m);
+    const pulse = m.querySelector(".pulse"); if (pulse) anims.push({ el: pulse, at: t0, kind: "pulse" });
+    box.append(h("div", "disc", "ESQUEMA ORIENTATIVO · NO ES EL MAPA OFICIAL"));
+  } else if (w.type === "outro") {
+    const btn = h("div", "btn", "SUSCRÍBETE"); box.append(btn);
+    const last = lines[lines.length - 1]; reveal(btn, last.start, "pop"); anims.push({ el: btn, at: last.start + 0.6, kind: "beat" });
+    const ch = h("div", "ch", `<b>${esc(V.channel.name)}</b> · ${esc(V.channel.tagline)}`); box.append(ch); reveal(ch, last.start + 0.4);
+  }
+  return box;
+}
+
+function chunkLine(line) {
+  const words = line.text.split(/\s+/), chunks = []; let cur = [];
+  for (const w of words) {
+    if (cur.length && (cur.join(" ").length + w.length + 1 > 40)) { chunks.push(cur); cur = []; }
+    cur.push(w);
+    if (/[.:?!]$/.test(w) && cur.join(" ").length > 22) { chunks.push(cur); cur = []; }
+  }
+  if (cur.length) chunks.push(cur);
+  if (chunks.length > 1 && chunks[chunks.length - 1].join(" ").length < 9) { const l = chunks.pop(); chunks[chunks.length - 1].push(...l); }
+  const total = words.reduce((a, w) => a + w.length + 1, 0); let t = line.start;
+  for (const c of chunks) {
+    const ws = c.map((w) => { const d = line.dur * (w.length + 1) / total; const o = { w, start: t, end: t + d }; t += d; return o; });
+    caps.push({ start: ws[0].start, end: ws[ws.length - 1].end, words: ws });
+  }
+}
+
+window.setup = function (video, channel, timings) {
+  V = { video, channel }; T = timings; anims = []; caps = []; sceneEls = [];
+  const root = $("#scenes"); root.innerHTML = "";
+  video.scenes.forEach((scene, i) => {
+    const tm = timings.scenes[i], el = h("div", "scene");
+    const k = h("div", "kicker", esc(scene.kicker)), hd = h("div", "headline", esc(scene.headline));
+    el.append(k, hd, buildWidget(scene, tm, i)); root.append(el);
+    reveal(k, tm.start + 0.05, "left"); reveal(hd, tm.start + 0.12, "up");
+    sceneEls.push({ el, start: tm.start, end: tm.end, first: i === 0, last: i === video.scenes.length - 1 });
+    tm.lines.forEach(chunkLine);
+  });
+  // los subtítulos se mantienen hasta el siguiente bloque si el hueco es corto
+  caps.forEach((c, i) => { const n = caps[i + 1]; c.hold = n && n.start - c.end < 0.4 ? n.start : c.end + 0.25; });
+  return document.fonts.ready.then(() => true);
+};
+
+let capIdx = -2;
+window.seek = function (t) {
+  $("#grid").style.backgroundPosition = `0px ${(t * 90) % 120}px`;
+  $("#sun").style.transform = `translateY(${Math.sin(t * 0.5) * 6}px) scale(${1 + Math.sin(t * 0.8) * 0.008})`;
+  for (const s of sceneEls) {
+    const a = s.first ? 1 : clamp((t - s.start + 0.12) / 0.3), b = s.last ? 1 : clamp((s.end - 0.1 - t) / 0.22);
+    const o = t < s.start - 0.12 || t > s.end ? 0 : Math.min(a, b);
+    s.el.style.opacity = o; s.el.style.visibility = o > 0 ? "visible" : "hidden";
+    s.el.style.transform = `translateX(${(1 - b) * -50}px)`;
+  }
+  for (const a of anims) {
+    const p = clamp((t - a.at) / 0.45), e = easeOut(p);
+    if (a.kind === "up") { a.el.style.opacity = e; a.el.style.transform = `translateY(${(1 - e) * 46}px)`; }
+    else if (a.kind === "left") { a.el.style.opacity = e; a.el.style.transform = `translateX(${(1 - e) * -70}px)`; }
+    else if (a.kind === "pop") { a.el.style.opacity = clamp(p * 3); a.el.style.transform = `scale(${0.6 + 0.4 * backOut(p)})`; }
+    else if (a.kind === "grow") { a.el.style.transform = `scaleX(${easeOut(clamp((t - a.at) / 0.9))})`; }
+    else if (a.kind === "count") { a.el.textContent = Math.round(a.to * easeOut(clamp((t - a.at) / 0.9))); }
+    else if (a.kind === "pulse") { const q = ((t - a.at) % 1.2) / 1.2; a.el.setAttribute("r", 20 + q * 46); a.el.setAttribute("opacity", 1 - q); }
+    else if (a.kind === "beat" && t > a.at) { a.el.style.transform = `scale(${1 + 0.04 * Math.max(0, Math.sin((t - a.at) * 6))})`; }
+  }
+  const i = caps.findIndex((c) => t >= c.start - 0.05 && t < c.hold);
+  const cap = $("#cap");
+  if (i !== capIdx) { capIdx = i; cap.innerHTML = i < 0 ? "" : `<div class="pill">${caps[i].words.map((w) => `<span>${esc(w.w)}</span>`).join(" ")}</div>`; }
+  if (i >= 0) { const sp = cap.querySelectorAll("span"); caps[i].words.forEach((w, k) => { sp[k].className = t >= w.end ? "on" : t >= w.start - 0.05 ? "now" : ""; }); }
+  $("#bar").style.width = (1920 * clamp(t / T.duration)) + "px";
+};
+
+// Miniatura 1920x1080 (YouTube la reescala a 1280x720).
+window.thumb = function (video) {
+  $("#scenes").innerHTML = ""; $("#cap").innerHTML = ""; $("#bar").style.width = 0; $("#bug").style.display = "none";
+  $("#shade").style.background = "linear-gradient(90deg, rgba(13,6,32,.8) 0%, rgba(13,6,32,.35) 60%, rgba(13,6,32,0) 100%)";
+  const el = h("div", "thumb", `<div class="top">${esc(video.thumb.top)}</div><div class="bigt">${esc(video.thumb.big)}</div><div class="tag">${esc(video.thumb.tag)}</div>`);
+  $("#scenes").append(el);
+  const big = el.querySelector(".bigt"); let fs = 300;
+  while ((big.scrollHeight > 560 || big.scrollWidth > 1300) && fs > 120) { fs -= 10; big.style.fontSize = fs + "px"; }
+  return document.fonts.ready.then(() => true);
+};
+</script>
+</body>
+</html>

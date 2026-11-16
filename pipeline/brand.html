@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+@font-face { font-family: "Anton"; src: url("../node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2") format("woff2"); }
+* { margin: 0; box-sizing: border-box; }
+body { background: #0d0620; font-family: "Inter", sans-serif; color: #fff3e0; overflow: hidden; }
+#b { position: relative; width: 2560px; height: 1440px; overflow: hidden; background: linear-gradient(180deg, #0d0620 0%, #1b0b3a 28%, #4a1570 50%, #c2337f 64%, #ff8a4a 72%, #1b0b3a 72.2%, #0d0620 100%); }
+.sun { position: absolute; border-radius: 50%; background: linear-gradient(180deg, #ffe27a 0%, #ff9a3d 45%, #ff3d9a 100%);
+  -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 8%, transparent 8% 10.5%); }
+#b .sun { left: 1640px; top: 330px; width: 760px; height: 760px; opacity: .9; }
+#b .floor { position: absolute; left: 0; top: 1038px; width: 100%; height: 402px; background: linear-gradient(180deg, #1b0b3a, #0d0620); }
+/* zona segura de YouTube: 1546x423 centrada */
+#b .safe { position: absolute; left: 507px; top: 508px; width: 1546px; height: 423px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(13,6,32,.72); border-radius: 30px; }
+.name { font-family: "Anton"; font-size: 210px; line-height: 1; letter-spacing: 4px; }
+.name em { font-style: normal; background: linear-gradient(180deg, #ffe27a, #ff9a3d 50%, #ff3d9a); -webkit-background-clip: text; color: transparent; }
+.tag { margin-top: 22px; font-size: 54px; font-weight: 800; letter-spacing: 3px; color: #ffd166; text-transform: uppercase; }
+#a { position: relative; width: 800px; height: 800px; overflow: hidden; background: linear-gradient(180deg, #1b0b3a 0%, #4a1570 55%, #c2337f 100%); display: none; }
+#a .sun { left: 100px; top: 100px; width: 600px; height: 600px; }
+#a .l { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: "Anton"; font-size: 430px; color: #120826; -webkit-text-stroke: 14px #fff3e0; paint-order: stroke fill; }
+</style></head>
+<body>
+<div id="b"><div class="sun"></div><div class="floor"></div>
+  <div class="safe"><div class="name">LEONIDA <em>AL DÍA</em></div><div class="tag">Todo sobre GTA 6 · sin humo</div></div></div>
+<div id="a"><div class="sun"></div><div class="l">L</div></div>
+</body></html>
